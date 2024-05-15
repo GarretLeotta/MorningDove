@@ -1,0 +1,15 @@
+services:
+  rabbitmq:
+    image: rabbitmq:3-management
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    env_file:
+      - ".env"
+  notifier:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: "${DOVETARGET:-runner}"
+    env_file:
+      - ".env"
