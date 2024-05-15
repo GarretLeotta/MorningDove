@@ -19,7 +19,7 @@ with open(os.path.join('.', f"secrets/AuthKey_{key_id}.p8"), 'r') as f:
 
 my_device = os.environ.get('TEST_DEVICETOKEN', 'secret')
 
-payload = {"aps":{"alert":{"title":"Notification Title","subtitle":"New Message","body":"Message Content"}},"navigation":"chat:1"}
+payload = '{"aps":{"alert":{"title":"Notification Title","subtitle":"New Message","body":"Message Content"}},"navigation":"chat:1"}'
 topic = os.environ.get('APNS_TOPIC', 'secret')
 
 DEV_SERV = 'https://api.sandbox.push.apple.com'
@@ -42,15 +42,16 @@ def create_token():
 async def send_noti(client, token):
     headers = {}
     headers['authorization'] = f"bearer {token}"
+    headers['apns-topic'] = topic
     headers['apns-push-type'] = 'alert'
     # TODO: apns-expiration
     headers['apns-priority'] = '5'
-    headers['apns-topic'] = topic
+    
     # TODO: for chats, this is "chat{chatId}"
     # headers['apns-collapse-id'] = 4
 
     url = f"{SERV}/3/device/{my_device}"
-    r = await client.post(url, headers=headers, json=payload)
+    r = await client.post(url, headers=headers, content=payload)
     print(r.http_version)
     print(r.status_code)
     print(r.content)
